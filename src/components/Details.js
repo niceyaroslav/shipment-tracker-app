@@ -35,6 +35,22 @@ const Details = () => {
         <DialogContent>
             {formData
             .map((field) => {
+              if (field.label === "Date") {
+                const modify = (d) => {
+                  let dateList = d.split('-')
+                  return [dateList[1], dateList[2], dateList[0]].join('/')
+                }
+                return (<TextField
+                  key={field.key}
+                  margin="dense"
+                  type={field.type}
+                  label={field.label}
+                  style={{width: "45%", margin: "2%"}}
+                  variant="standard"
+                  defaultValue={field.value}
+                  onChange={(event) => dispatch(shipments.setRowData({...rowData, [field.key]: modify(event.target.value)}))} 
+                />)
+              } else {
                 return (<TextField
                 key={field.key}
                 margin="dense"
@@ -45,6 +61,7 @@ const Details = () => {
                 defaultValue={field.value}
                 onChange={(event) => dispatch(shipments.setRowData({...rowData, [field.key]: event.target.value}))} 
               />)
+              }
             })}
         </DialogContent>
         <DialogActions>
