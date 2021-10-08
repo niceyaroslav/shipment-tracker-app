@@ -1,25 +1,64 @@
-import logo from './logo.svg';
-import './App.css';
+import { makeStyles } from "@material-ui/core";
+import ArticleIcon from '@mui/icons-material/Article';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
+import React, { useEffect } from "react";
+import Details from "./components/Details";
+import Header from './components/Header';
+import Table from './components/Table';
+import { useDispatch } from 'react-redux'
+import { fetchShipments, shipments } from "./store/shipmentsReducer";
 
-function App() {
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1
+  },
+  title: {
+    flexGrow: 1,
+    marginTop: '1.2em',
+    fontFamily: 'Noto Sans JP, sans-serif',
+  }
+}));
+
+const App = () => {
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  useEffect(() => {
+      dispatch(fetchShipments())
+  }, [dispatch]);
+ 
+
+  const showRowDataInModal = (data) => {
+    dispatch(shipments.setOpen())
+    dispatch(shipments.setRowData(data))
+  }
+
+  const columns = [
+    {field: 'orderNo', headerName: 'ORDER NO', width: 150},
+    {field: 'date', headerName: 'DATE', width: 120},
+    {field: 'customer', headerName: 'CUSTOMER', width: 220},
+    {field: 'trackingNo', headerName: 'TRACKING NO', width:250},
+    {field: 'status', headerName: 'STATUS', width: 130},
+    {field: 'consignee', headerName: 'CONSIGNEE', width: 180},
+    {field: '  ', headerName: '', sortable: false, width: 85, disableColumnMenu: true, renderCell: (cellValues) => 
+      <IconButton aria-label="delete" style={{color: "orange"}} onClick={() => setTimeout(() => dispatch(shipments.deleteShipment(cellValues.row.id)))}>
+        <DeleteIcon />
+      </IconButton>
+    },
+    {field: '', headerName: '', sortable: false, width: 80, disableColumnMenu: true, renderCell: (cellValues) => 
+    <IconButton aria-label="details" color="primary" onClick={() => showRowDataInModal(cellValues.row)}>
+      <ArticleIcon />
+    </IconButton>}
+  ];
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header classes={classes}/>
+      <main>
+        <Table columns={columns}/>
+        <Details />
+      </main>
+    </>
   );
-}
-
+};
 export default App;
